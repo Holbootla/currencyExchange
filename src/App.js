@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import './index.css';
 import {
   Container,
@@ -15,20 +16,26 @@ import {
   TextField,
 } from '@mui/material/';
 import { API_KEY, API_SOURCE, CONVERT, CURRENCIES } from './API';
+import {
+  setCurrencies,
+  setCurrentCurrency,
+  setAction,
+  setRate,
+  setFirstCurrency,
+  setSecondCurrency,
+} from './redux/currencyReducer';
 
 function App() {
-  const [currencies, setCurrencies] = useState('');
-  const [currentCurrency, setCurrentCurrency] = useState('');
-  const [action, setAction] = useState('buy');
-  const [rate, setRate] = useState('');
-  const [firstCurrency, setFirstCurrency] = useState(0);
-  const [secondCurrency, setSecondCurrency] = useState(0);
+  const dispatch = useDispatch();
+  const { currencies, currentCurrency, action, rate, firstCurrency, secondCurrency } = useSelector(
+    (state) => state.currency
+  );
 
   const getCurrencies = async () => {
     try {
       const response = await fetch(`${API_SOURCE}${CURRENCIES}?apiKey=${API_KEY}`);
       const result = await response.json();
-      setCurrencies(Object.values(result.results));
+      dispatch(setCurrencies(Object.values(result.results)));
     } catch (error) {
       console.log(error);
     }
@@ -42,7 +49,7 @@ function App() {
         }&compact=ultra&apiKey=${API_KEY}`
       );
       const result = await response.json();
-      setRate(Object.values(result)[0]);
+      dispatch(setRate(Object.values(result)[0]));
     } catch (error) {
       console.log(error);
     }
@@ -58,24 +65,26 @@ function App() {
 
   const handleChangeCurrentCurrency = (event) => {
     const currentValue = event.target.value;
-    setCurrentCurrency(currentValue);
+    dispatch(setCurrentCurrency(currentValue));
+    dispatch(setFirstCurrency(''));
+    dispatch(setSecondCurrency(''));
   };
 
   const handleChangeAction = (event) => {
-    setAction(event.target.value);
+    dispatch(setAction(event.target.value));
     const tempCurrency = firstCurrency;
-    setFirstCurrency(secondCurrency);
-    setSecondCurrency(tempCurrency);
+    dispatch(setFirstCurrency(secondCurrency));
+    dispatch(setSecondCurrency(tempCurrency));
   };
 
   const handleChangeAmount = (event) => {
     if (event.target.id === 'firstCurrency') {
-      setFirstCurrency(event.target.value);
-      setSecondCurrency(event.target.value * rate);
+      dispatch(setFirstCurrency(event.target.value));
+      dispatch(setSecondCurrency(event.target.value * rate));
     }
     if (event.target.id === 'secondCurrency') {
-      setSecondCurrency(event.target.value);
-      setFirstCurrency(event.target.value * rate);
+      dispatch(setSecondCurrency(event.target.value));
+      dispatch(setFirstCurrency(event.target.value * rate));
     }
   };
 
