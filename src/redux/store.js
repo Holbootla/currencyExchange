@@ -1,10 +1,8 @@
-import { createStore, combineReducers } from 'redux';
-import { currencyReducer } from './currencyReducer';
+import { configureStore } from '@reduxjs/toolkit';
+import currencyReducer from './currencySlice';
 
-const rootReducer = combineReducers({
-  currency: currencyReducer,
+export default configureStore({
+  reducer: {
+    currency: currencyReducer,
+  },
 });
-
-const store = createStore(rootReducer);
-
-export default store;
