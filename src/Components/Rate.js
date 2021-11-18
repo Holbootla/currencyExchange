@@ -9,7 +9,7 @@ function Rate() {
   const { currentCurrency, action, rate } = useSelector(selectCurrencySlice);
 
   useEffect(() => {
-    dispatch(getRate(action, currentCurrency));
+    dispatch(getRate({ action, currentCurrency }));
   }, [currentCurrency, action, dispatch]);
 
   return (

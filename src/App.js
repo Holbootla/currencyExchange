@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 import './index.css';
 import { Container, Typography } from '@mui/material/';
+import { FIRST_CURRENCY, SECOND_CURRENCY } from './constants';
 import { selectCurrencySlice } from './redux/currencySlice';
 import CurrencyList from './Components/CurrencyList';
 import MarketAction from './Components/MarketAction';
@@ -30,8 +31,8 @@ function App() {
       {currentCurrency && (
         <>
           <Rate />
-          <CurrencyInput id='firstCurrency' />
-          <CurrencyInput id='secondCurrency' />
+          <CurrencyInput id={FIRST_CURRENCY} />
+          <CurrencyInput id={SECOND_CURRENCY} />
         </>
       )}
     </Container>

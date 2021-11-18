@@ -1,22 +1,30 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Api from '../API';
+import { BUY } from '../constants';
 
 const initialState = {
   currencies: '',
   currentCurrency: '',
-  action: 'buy',
+  action: BUY,
   rate: '',
   firstCurrency: '',
   secondCurrency: '',
 };
 
+export const getCurrencies = createAsyncThunk('currency/getCurrencies', async () => {
+  const api = new Api();
+  return await api.getCurrencies();
+});
+
+export const getRate = createAsyncThunk('currency/getRate', async ({ action, currentCurrency }) => {
+  const api = new Api();
+  return await api.getRate(action, currentCurrency);
+});
+
 export const currencySlice = createSlice({
   name: 'currency',
   initialState,
   reducers: {
-    setCurrencies: (state, action) => {
-      state.currencies = action.payload;
-    },
     setCurrentCurrency: (state, action) => {
       state.currentCurrency = action.payload;
       state.firstCurrency = '';
@@ -25,15 +33,6 @@ export const currencySlice = createSlice({
     setAction: (state, action) => {
       state.action = action.payload;
       [state.firstCurrency, state.secondCurrency] = [state.secondCurrency, state.firstCurrency];
-    },
-    setRate: (state, action) => {
-      state.rate = +action.payload.toFixed(4);
-    },
-    setFirstCurrency: (state, action) => {
-      state.firstCurrency = action.payload;
-    },
-    setSecondCurrency: (state, action) => {
-      state.secondCurrency = action.payload;
     },
     calculateStraightRate: (state, action) => {
       state.firstCurrency = action.payload;
@@ -44,42 +43,18 @@ export const currencySlice = createSlice({
       state.firstCurrency = +(action.payload / state.rate).toFixed(2);
     },
   },
+  extraReducers: {
+    [getCurrencies.fulfilled]: (state, action) => {
+      state.currencies = Object.values(action.payload);
+    },
+    [getRate.fulfilled]: (state, action) => {
+      state.rate = +Object.values(action.payload)[0].toFixed(4);
+    },
+  },
 });
 
-export const getCurrencies = () => (dispatch) => {
-  const api = new Api();
-  (async function () {
-    try {
-      const currencies = await api.getCurrencies();
-      dispatch(setCurrencies(Object.values(currencies)));
-    } catch (error) {
-      console.log(error);
-    }
-  })();
-};
-
-export const getRate = (action, currentCurrency) => (dispatch) => {
-  const api = new Api();
-  (async function () {
-    try {
-      const rate = await api.getRate(action, currentCurrency);
-      dispatch(setRate(Object.values(rate)[0]));
-    } catch (error) {
-      console.log(error);
-    }
-  })();
-};
-
-export const {
-  setCurrencies,
-  setCurrentCurrency,
-  setAction,
-  setRate,
-  setFirstCurrency,
-  setSecondCurrency,
-  calculateStraightRate,
-  calculateReverseRate,
-} = currencySlice.actions;
+export const { setCurrentCurrency, setAction, calculateStraightRate, calculateReverseRate } =
+  currencySlice.actions;
 
 export const selectCurrencySlice = (state) => state.currency;
 

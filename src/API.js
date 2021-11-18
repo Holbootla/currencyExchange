@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { BUY, SELL, BYN } from './constants';
 
 export default class Api {
   constructor() {
@@ -13,8 +14,8 @@ export default class Api {
   }
   async getRate(action, currentCurrency) {
     const response = await axios.get(
-      `${this.API_SOURCE}${this.CONVERT}?q=${action === 'sell' ? currentCurrency : 'BYN'}_${
-        action === 'buy' ? currentCurrency : 'BYN'
+      `${this.API_SOURCE}${this.CONVERT}?q=${action === SELL ? currentCurrency : BYN}_${
+        action === BUY ? currentCurrency : BYN
       }&compact=ultra&apiKey=${this.API_KEY}`
     );
     return response.data;
