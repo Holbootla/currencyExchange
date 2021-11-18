@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { API_KEY, API_SOURCE, CONVERT, CURRENCIES } from '../API';
+import Api from '../API';
 
 const initialState = {
   currencies: '',
@@ -47,11 +47,11 @@ export const currencySlice = createSlice({
 });
 
 export const getCurrencies = () => (dispatch) => {
+  const api = new Api();
   (async function () {
     try {
-      const response = await fetch(`${API_SOURCE}${CURRENCIES}?apiKey=${API_KEY}`);
-      const result = await response.json();
-      dispatch(setCurrencies(Object.values(result.results)));
+      const currencies = await api.getCurrencies();
+      dispatch(setCurrencies(Object.values(currencies)));
     } catch (error) {
       console.log(error);
     }
@@ -59,15 +59,11 @@ export const getCurrencies = () => (dispatch) => {
 };
 
 export const getRate = (action, currentCurrency) => (dispatch) => {
+  const api = new Api();
   (async function () {
     try {
-      const response = await fetch(
-        `${API_SOURCE}${CONVERT}?q=${action === 'sell' ? currentCurrency : 'BYN'}_${
-          action === 'buy' ? currentCurrency : 'BYN'
-        }&compact=ultra&apiKey=${API_KEY}`
-      );
-      const result = await response.json();
-      dispatch(setRate(Object.values(result)[0]));
+      const rate = await api.getRate(action, currentCurrency);
+      dispatch(setRate(Object.values(rate)[0]));
     } catch (error) {
       console.log(error);
     }
