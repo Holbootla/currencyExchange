@@ -1,24 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import { useSelector } from 'react-redux';
+import './index.css';
+import { Container, Typography } from '@mui/material/';
+import { FIRST_CURRENCY, SECOND_CURRENCY } from './constants';
+import { selectCurrencySlice } from './redux/currencySlice';
+import CurrencyList from './Components/CurrencyList';
+import MarketAction from './Components/MarketAction';
+import CurrencyInput from './Components/CurrencyInput';
+import Rate from './Components/Rate';
 
 function App() {
+  const { currentCurrency } = useSelector(selectCurrencySlice);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container
+      maxWidth='sm'
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Typography variant='h2'>Currency exchange</Typography>
+      <div>
+        <CurrencyList />
+        <MarketAction />
+      </div>
+
+      {currentCurrency && (
+        <>
+          <Rate />
+          <CurrencyInput id={FIRST_CURRENCY} />
+          <CurrencyInput id={SECOND_CURRENCY} />
+        </>
+      )}
+    </Container>
   );
 }
 
